@@ -26,6 +26,7 @@ export interface NewsItem {
   pubDate: string;
   source: string;
   category: Category;
+  trendScore?: number; // how many sources covered this story
   thumbnail?: string;
 }
 

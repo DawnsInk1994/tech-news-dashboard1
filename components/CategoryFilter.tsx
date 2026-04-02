@@ -2,24 +2,24 @@
 
 import type { Category } from "@/lib/types";
 import { CATEGORIES } from "@/lib/categories";
+import { Bookmark } from "lucide-react";
+
+export type ActiveTab = Category | "all" | "saved";
 
 interface CategoryFilterProps {
-  active: Category | "all";
-  onChange: (cat: Category | "all") => void;
+  active: ActiveTab;
+  onChange: (cat: ActiveTab) => void;
   counts: Record<string, number>;
+  savedCount: number;
 }
 
 const ALL_CAT = {
   id: "all" as const,
   labelHe: "הכל",
-  color: "#a0a0d0",
   gradient: "linear-gradient(135deg,#6366f1,#8b5cf6)",
   glow: "rgba(99,102,241,0.4)",
-  bg: "rgba(99,102,241,0.12)",
-  border: "rgba(99,102,241,0.4)",
 };
 
-// Gradient per category for active state
 const GRADIENTS: Record<string, { gradient: string; glow: string }> = {
   ai:            { gradient: "linear-gradient(135deg,#7c3aed,#a855f7)", glow: "rgba(168,85,247,0.45)" },
   social:        { gradient: "linear-gradient(135deg,#1d4ed8,#3b82f6)", glow: "rgba(59,130,246,0.45)" },
@@ -29,7 +29,7 @@ const GRADIENTS: Record<string, { gradient: string; glow: string }> = {
   radar:         { gradient: "linear-gradient(135deg,#be185d,#ec4899)", glow: "rgba(236,72,153,0.45)" },
 };
 
-export default function CategoryFilter({ active, onChange, counts }: CategoryFilterProps) {
+export default function CategoryFilter({ active, onChange, counts, savedCount }: CategoryFilterProps) {
   const pills = [ALL_CAT, ...CATEGORIES.map(c => ({ ...c, ...GRADIENTS[c.id] }))];
 
   return (
@@ -46,7 +46,7 @@ export default function CategoryFilter({ active, onChange, counts }: CategoryFil
             const count = cat.id === "all" ? counts._total : counts[cat.id];
             return (
               <button key={cat.id}
-                onClick={() => onChange(cat.id as Category | "all")}
+                onClick={() => onChange(cat.id as ActiveTab)}
                 className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-all duration-200"
                 style={{
                   background: isActive ? cat.gradient : "rgba(255,255,255,0.05)",
@@ -68,6 +68,30 @@ export default function CategoryFilter({ active, onChange, counts }: CategoryFil
               </button>
             );
           })}
+
+          {/* Saved tab */}
+          <button
+            onClick={() => onChange("saved")}
+            className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-all duration-200"
+            style={{
+              background: active === "saved" ? "linear-gradient(135deg,#4f46e5,#7c3aed)" : "rgba(255,255,255,0.05)",
+              border: active === "saved" ? "1px solid transparent" : "1px solid rgba(255,255,255,0.1)",
+              color: active === "saved" ? "#fff" : "#7070a0",
+              boxShadow: active === "saved" ? "0 0 18px rgba(99,102,241,0.4), 0 2px 8px rgba(0,0,0,0.4)" : "none",
+              transform: active === "saved" ? "scale(1.04)" : "scale(1)",
+            }}>
+            <Bookmark size={11} />
+            שמורות
+            {savedCount > 0 && (
+              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full"
+                style={{
+                  background: active === "saved" ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.07)",
+                  color: active === "saved" ? "#fff" : "#505070",
+                }}>
+                {savedCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
     </div>
