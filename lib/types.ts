@@ -20,6 +20,7 @@ export interface CategoryConfig {
 export interface NewsItem {
   id: string;
   title: string;
+  titleHe?: string;
   summary: string;
   link: string;
   pubDate: string;
