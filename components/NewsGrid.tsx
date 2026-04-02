@@ -1,6 +1,6 @@
 "use client";
 
-import type { NewsItem, SavedArticle } from "@/lib/types";
+import type { NewsItem } from "@/lib/types";
 import NewsCard from "./NewsCard";
 import { NewsGridSkeleton } from "./LoadingSkeleton";
 import { Inbox } from "lucide-react";
@@ -8,10 +8,9 @@ import { Inbox } from "lucide-react";
 interface NewsGridProps {
   items: NewsItem[];
   loading: boolean;
-  onSave: (article: SavedArticle) => void;
 }
 
-export default function NewsGrid({ items, loading, onSave }: NewsGridProps) {
+export default function NewsGrid({ items, loading }: NewsGridProps) {
   if (loading && items.length === 0) {
     return <NewsGridSkeleton />;
   }
@@ -32,7 +31,7 @@ export default function NewsGrid({ items, loading, onSave }: NewsGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {items.map((item) => (
-        <NewsCard key={item.id} item={item} onSave={onSave} />
+        <NewsCard key={item.id} item={item} />
       ))}
     </div>
   );

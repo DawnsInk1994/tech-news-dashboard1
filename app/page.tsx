@@ -1,59 +1,35 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import TopBar from "@/components/TopBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import SearchBar from "@/components/SearchBar";
 import NewsGrid from "@/components/NewsGrid";
-import SavedArticles from "@/components/SavedArticles";
-import type { Category, SavedArticle } from "@/lib/types";
+import type { Category } from "@/lib/types";
 import { useNewsFeeds } from "@/hooks/useNewsFeeds";
-import {
-  getSavedArticles,
-  saveArticle,
-  deleteArticle,
-  clearAllArticles,
-} from "@/lib/storage";
 import { CATEGORIES } from "@/lib/categories";
 
 export default function HomePage() {
   const { items, allItems, loading, lastUpdated, activeCategory, setActiveCategory, refresh } =
     useNewsFeeds();
 
-  const [savedArticles, setSavedArticles] = useState<SavedArticle[]>([]);
-  const [showSaved, setShowSaved] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Load saved articles from localStorage on mount
-  useEffect(() => {
-    setSavedArticles(getSavedArticles());
-  }, []);
+  const handleCategoryChange = useCallback(
+    (cat: Category | "all") => {
+      setActiveCategory(cat);
+      setSearchQuery(""); // clear search when switching category
+    },
+    [setActiveCategory]
+  );
 
-  const handleSave = useCallback((article: SavedArticle) => {
-    saveArticle(article);
-    setSavedArticles(getSavedArticles());
-    setShowSaved(true);
-  }, []);
-
-  const handleDelete = useCallback((id: string) => {
-    deleteArticle(id);
-    setSavedArticles(getSavedArticles());
-  }, []);
-
-  const handleClearAll = useCallback(() => {
-    if (confirm("למחוק את כל הידיעות השמורות?")) {
-      clearAllArticles();
-      setSavedArticles([]);
-    }
-  }, []);
-
-  // Build category counts
+  // Build category counts from all items
   const counts: Record<string, number> = { _total: allItems.length };
   for (const cat of CATEGORIES) {
     counts[cat.id] = allItems.filter((i) => i.category === cat.id).length;
   }
 
-  // Search filter
+  // Search filter on top of category filter
   const q = searchQuery.trim().toLowerCase();
   const filteredItems = q
     ? items.filter(
@@ -70,14 +46,11 @@ export default function HomePage() {
         lastUpdated={lastUpdated}
         loading={loading}
         onRefresh={refresh}
-        savedCount={savedArticles.length}
-        onToggleSaved={() => setShowSaved((s) => !s)}
-        showSaved={showSaved}
       />
 
       <CategoryFilter
         active={activeCategory}
-        onChange={(cat) => setActiveCategory(cat as Category | "all")}
+        onChange={handleCategoryChange}
         counts={counts}
       />
 
@@ -88,60 +61,24 @@ export default function HomePage() {
       />
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6">
-        <div className="flex gap-6 items-start">
-          {/* Main news feed */}
-          <div className="flex-1 min-w-0">
-            {/* Error banner */}
-            {/* (errors are per-feed silently swallowed; global network failures shown here) */}
+        <NewsGrid items={filteredItems} loading={loading} />
 
-            <NewsGrid
-              items={filteredItems}
-              loading={loading}
-              onSave={handleSave}
-            />
-
-            {/* Load indicator at bottom when refreshing existing items */}
-            {loading && items.length > 0 && (
-              <div className="flex justify-center py-6">
-                <div
-                  className="text-xs px-3 py-1.5 rounded-full"
-                  style={{
-                    background: "rgba(124,58,237,0.1)",
-                    border: "1px solid rgba(124,58,237,0.2)",
-                    color: "#a78bfa",
-                  }}
-                >
-                  מעדכן…
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Saved articles sidebar — desktop */}
-          {showSaved && (
-            <div className="hidden lg:block">
-              <SavedArticles
-                articles={savedArticles}
-                onDelete={handleDelete}
-                onClearAll={handleClearAll}
-              />
+        {loading && items.length > 0 && (
+          <div className="flex justify-center py-6">
+            <div
+              className="text-xs px-3 py-1.5 rounded-full"
+              style={{
+                background: "rgba(124,58,237,0.1)",
+                border: "1px solid rgba(124,58,237,0.2)",
+                color: "#a78bfa",
+              }}
+            >
+              מעדכן…
             </div>
-          )}
-        </div>
-
-        {/* Saved articles — mobile overlay */}
-        {showSaved && (
-          <div className="lg:hidden mt-6">
-            <SavedArticles
-              articles={savedArticles}
-              onDelete={handleDelete}
-              onClearAll={handleClearAll}
-            />
           </div>
         )}
       </main>
 
-      {/* Footer */}
       <footer
         className="text-center py-6 text-xs"
         style={{
