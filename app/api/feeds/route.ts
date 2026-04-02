@@ -69,12 +69,12 @@ function parseRSS(xml: string, feedUrl: string, category: Category, sourceName: 
       extractTag(block, "content");
     const summary = stripHtml(rawDesc).slice(0, 200).trimEnd() + (rawDesc.length > 200 ? "…" : "");
 
-    // ID
+    // ID — include category + link to guarantee uniqueness across feeds
     const guid = extractTag(block, "guid") || extractTag(block, "id") || link;
-    const id = Buffer.from(guid.slice(-64))
+    const id = Buffer.from(`${category}:${guid}`.slice(-80))
       .toString("base64")
       .replace(/[^a-zA-Z0-9]/g, "")
-      .slice(0, 16);
+      .slice(0, 20);
 
     items.push({ id, title, summary, link, pubDate, source: sourceName, category });
   }

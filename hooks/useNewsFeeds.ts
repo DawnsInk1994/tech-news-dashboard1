@@ -41,6 +41,7 @@ export function useNewsFeeds() {
       ? items
       : items.filter((item) => item.category === activeCategory);
 
+
   return {
     items: filteredItems,
     allItems: items,

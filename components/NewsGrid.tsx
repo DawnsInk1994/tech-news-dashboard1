@@ -31,7 +31,7 @@ export default function NewsGrid({ items, loading }: NewsGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {items.map((item) => (
-        <NewsCard key={item.id} item={item} />
+        <NewsCard key={item.link || item.id} item={item} />
       ))}
     </div>
   );
