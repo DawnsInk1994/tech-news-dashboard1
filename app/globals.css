@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base:      #07080f;
+  --bg-surface:   #0e0f1c;
+  --bg-card:      #12142a;
+  --bg-card-h:    #181a32;
+  --border-dim:   rgba(255,255,255,0.07);
+  --border-mid:   rgba(255,255,255,0.12);
+  --txt-primary:  #eeeef8;
+  --txt-secondary:#9898c0;
+  --txt-muted:    #4a4a70;
+}
+
+* { box-sizing: border-box; }
+
+html { direction: rtl; }
+
+body {
+  background: var(--bg-base);
+  color: var(--txt-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ──────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: #2a2a55; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #5555cc; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Skeleton shimmer ───────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.09) 50%,
+    rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 6px;
+}
+
+/* ── Card glow on hover ─────────────────────── */
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(8px); opacity: 0; }
+                      to  { transform: translateY(0);   opacity: 1; } }
+.animate-fade-in  { animation: fadeIn  .25s ease; }
+.animate-slide-up { animation: slideUp .25s ease; }
+
+/* ── Article body ───────────────────────────── */
+.article-body p { margin-bottom: .75rem; line-height: 1.7; }
+
+/* ── Focus ring ─────────────────────────────── */
+button:focus-visible, a:focus-visible {
+  outline: 2px solid rgba(139,92,246,.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
